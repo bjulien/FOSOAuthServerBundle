@@ -1,9 +1,12 @@
 framework:
-    form:
-        enabled: true
+    form: ~
     secret: test
     router:
         resource: '%kernel.project_dir%/Tests/Functional/config/routing.yml'
+
+twig:
+    exception_controller: null
+    strict_variables: '%kernel.debug%'
 
 twig:
     exception_controller: null

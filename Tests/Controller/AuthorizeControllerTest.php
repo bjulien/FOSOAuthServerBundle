@@ -63,7 +63,7 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     protected $oAuth2Server;
 
     /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|TokenStorageInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
      */
     protected $tokenStorage;
 
@@ -136,44 +136,34 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     {
         $this->requestStack = $this->getMockBuilder(RequestStack::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->form = $this->getMockBuilder(Form::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->authorizeFormHandler = $this->getMockBuilder(AuthorizeFormHandler::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->oAuth2Server = $this->getMockBuilder(OAuth2::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->tokenStorage = $this->getMockBuilder(TokenStorageInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->twig = $this->getMockBuilder(TwigEnvironment::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->router = $this->getMockBuilder(UrlGeneratorInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->clientManager = $this->getMockBuilder(ClientManagerInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->eventDispatcher = $this->getMockBuilder(EventDispatcherInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->session = $this->getMockBuilder(SessionInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->instance = new AuthorizeController(
             $this->requestStack,
@@ -191,39 +181,31 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
         /** @var \PHPUnit\Framework\MockObject\MockObject&Request $request */
         $request = $this->getMockBuilder(Request::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->requestQuery = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->requestRequest = $this->getMockBuilder(ParameterBag::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $request->query = $this->requestQuery;
         $request->request = $this->requestRequest;
         $this->request = $request;
         $this->user = $this->getMockBuilder(UserInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->client = $this->getMockBuilder(ClientInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->preAuthorizationEvent = $this->getMockBuilder(PreAuthorizationEvent::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->postAuthorizationEvent = $this->getMockBuilder(PostAuthorizationEvent::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
         $this->formView = $this->getMockBuilder(FormView::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         parent::setUp();
     }
@@ -232,20 +214,17 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->getMockBuilder(TokenInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->tokenStorage
             ->expects($this->at(0))
             ->method('getToken')
-            ->willReturn($token)
-        ;
+            ->willReturn($token);
 
         $token
             ->expects($this->at(0))
             ->method('getUser')
-            ->willReturn(null)
-        ;
+            ->willReturn(null);
 
         $this->expectException(AccessDeniedException::class);
         $this->expectExceptionMessage('This user does not have access to this section.');
@@ -257,27 +236,23 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->getMockBuilder(TokenInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->tokenStorage
             ->expects($this->at(0))
             ->method('getToken')
-            ->willReturn($token)
-        ;
+            ->willReturn($token);
 
         $token
             ->expects($this->at(0))
             ->method('getUser')
-            ->willReturn($this->user)
-        ;
+            ->willReturn($this->user);
 
         $this->session
             ->expects($this->at(0))
             ->method('get')
             ->with('_fos_oauth_server.ensure_logout')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $propertyReflection = new \ReflectionProperty(AuthorizeController::class, 'client');
         $propertyReflection->setAccessible(true);
@@ -287,27 +262,23 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(new PreAuthorizationEvent($this->user, $this->client))
-            ->willReturn($this->preAuthorizationEvent)
-        ;
+            ->willReturn($this->preAuthorizationEvent);
 
         $this->preAuthorizationEvent
             ->expects($this->once())
             ->method('isAuthorizedClient')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->authorizeFormHandler
             ->expects($this->at(0))
             ->method('process')
             ->with()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->form
             ->expects($this->at(0))
             ->method('createView')
-            ->willReturn($this->formView)
-        ;
+            ->willReturn($this->formView);
 
         $this->twig
             ->expects($this->once())
@@ -319,8 +290,7 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
                     'client' => $this->client,
                 ]
             )
-            ->willReturn($responseBody = 'response')
-        ;
+            ->willReturn($responseBody = 'response');
 
         $this->assertSame($responseBody, $this->instance->authorizeAction($this->request)->getContent());
     }
@@ -329,27 +299,23 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->getMockBuilder(TokenInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->tokenStorage
             ->expects($this->at(0))
             ->method('getToken')
-            ->willReturn($token)
-        ;
+            ->willReturn($token);
 
         $token
             ->expects($this->at(0))
             ->method('getUser')
-            ->willReturn($this->user)
-        ;
+            ->willReturn($this->user);
 
         $this->session
             ->expects($this->at(0))
             ->method('get')
             ->with('_fos_oauth_server.ensure_logout')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $propertyReflection = new \ReflectionProperty(AuthorizeController::class, 'client');
         $propertyReflection->setAccessible(true);
@@ -359,23 +325,20 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(new PreAuthorizationEvent($this->user, $this->client))
-            ->willReturn($this->preAuthorizationEvent)
-        ;
+            ->willReturn($this->preAuthorizationEvent);
 
         $this->preAuthorizationEvent
             ->expects($this->once())
             ->method('isAuthorizedClient')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
-        $randomScope = 'scope'.\random_bytes(10);
+        $randomScope = 'scope' . \random_bytes(10);
 
         $this->request
             ->expects($this->at(0))
             ->method('get')
             ->with('scope', null)
-            ->willReturn($randomScope)
-        ;
+            ->willReturn($randomScope);
 
         $response = new Response();
 
@@ -388,8 +351,7 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
                 $this->request,
                 $randomScope
             )
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $this->assertSame($response, $this->instance->authorizeAction($this->request));
     }
@@ -398,41 +360,35 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->getMockBuilder(TokenInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->tokenStorage
             ->expects($this->at(0))
             ->method('getToken')
-            ->willReturn($token)
-        ;
+            ->willReturn($token);
 
         $token
             ->expects($this->at(0))
             ->method('getUser')
-            ->willReturn($this->user)
-        ;
+            ->willReturn($this->user);
 
         $this->session
             ->expects($this->at(0))
             ->method('get')
             ->with('_fos_oauth_server.ensure_logout')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->session
             ->expects($this->at(1))
             ->method('invalidate')
             ->with(600)
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->session
             ->expects($this->at(2))
             ->method('set')
             ->with('_fos_oauth_server.ensure_logout', true)
-            ->willReturn(null)
-        ;
+            ->willReturn(null);
 
         $propertyReflection = new \ReflectionProperty(AuthorizeController::class, 'client');
         $propertyReflection->setAccessible(true);
@@ -442,27 +398,23 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->once())
             ->method('dispatch')
             ->with(new PreAuthorizationEvent($this->user, $this->client))
-            ->willReturn($this->preAuthorizationEvent)
-        ;
+            ->willReturn($this->preAuthorizationEvent);
 
         $this->preAuthorizationEvent
             ->expects($this->once())
             ->method('isAuthorizedClient')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->authorizeFormHandler
             ->expects($this->at(0))
             ->method('process')
             ->with()
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->form
             ->expects($this->at(0))
             ->method('createView')
-            ->willReturn($this->formView)
-        ;
+            ->willReturn($this->formView);
 
         $this->twig
             ->expects($this->once())
@@ -474,8 +426,7 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
                     'client' => $this->client,
                 ]
             )
-            ->willReturn($responseBody = 'response')
-        ;
+            ->willReturn($responseBody = 'response');
 
         $this->assertSame($responseBody, $this->instance->authorizeAction($this->request)->getContent());
     }
@@ -484,27 +435,23 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
     {
         $token = $this->getMockBuilder(TokenInterface::class)
             ->disableOriginalConstructor()
-            ->getMock()
-        ;
+            ->getMock();
 
         $this->tokenStorage
             ->expects($this->once())
             ->method('getToken')
-            ->willReturn($token)
-        ;
+            ->willReturn($token);
 
         $token
             ->expects($this->once())
             ->method('getUser')
-            ->willReturn($this->user)
-        ;
+            ->willReturn($this->user);
 
         $this->session
             ->expects($this->exactly(2))
             ->method('get')
             ->with('_fos_oauth_server.ensure_logout')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $propertyReflection = new \ReflectionProperty(AuthorizeController::class, 'client');
         $propertyReflection->setAccessible(true);
@@ -514,61 +461,52 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
             ->expects($this->at(0))
             ->method('dispatch')
             ->with(new PreAuthorizationEvent($this->user, $this->client))
-            ->willReturn($this->preAuthorizationEvent)
-        ;
+            ->willReturn($this->preAuthorizationEvent);
 
         $this->preAuthorizationEvent
             ->expects($this->once())
             ->method('isAuthorizedClient')
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
         $this->authorizeFormHandler
             ->expects($this->once())
             ->method('process')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->authorizeFormHandler
             ->expects($this->exactly(2))
             ->method('isAccepted')
-            ->willReturn(true)
-        ;
+            ->willReturn(true);
 
         $this->eventDispatcher
             ->expects($this->at(1))
             ->method('dispatch')
-            ->with(new PostAuthorizationEvent($this->user, $this->client, true))
-        ;
+            ->with(new PostAuthorizationEvent($this->user, $this->client, true));
 
-        $formName = 'formName'.\random_bytes(10);
+        $formName = 'formName' . \random_bytes(10);
 
         $this->form
             ->expects($this->once())
             ->method('getName')
-            ->willReturn($formName)
-        ;
+            ->willReturn($formName);
 
         $this->requestQuery
             ->expects($this->once())
             ->method('all')
-            ->willReturn([])
-        ;
+            ->willReturn([]);
 
         $this->requestRequest
             ->expects($this->once())
             ->method('has')
             ->with($formName)
-            ->willReturn(false)
-        ;
+            ->willReturn(false);
 
-        $randomScope = 'scope'.\random_bytes(10);
+        $randomScope = 'scope' . \random_bytes(10);
 
         $this->authorizeFormHandler
             ->expects($this->once())
             ->method('getScope')
-            ->willReturn($randomScope)
-        ;
+            ->willReturn($randomScope);
 
         $response = new Response();
 
@@ -581,8 +519,7 @@ class AuthorizeControllerTest extends \PHPUnit\Framework\TestCase
                 $this->request,
                 $randomScope
             )
-            ->willReturn($response)
-        ;
+            ->willReturn($response);
 
         $this->assertSame($response, $this->instance->authorizeAction($this->request));
     }
